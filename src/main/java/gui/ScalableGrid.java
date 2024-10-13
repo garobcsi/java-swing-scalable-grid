@@ -2,7 +2,16 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 
 import javax.swing.JFrame;
@@ -151,10 +160,7 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         offsetY += (targetOffsetY - offsetY) * 0.1;
         scale += (targetScale - scale) * 0.1;
 
-        // Only repaint when the position or scale changes
-        if (Math.abs(offsetX - targetOffsetX) > 0.1 || Math.abs(offsetY - targetOffsetY) > 0.1 || Math.abs(scale - targetScale) > 0.01) {
-            repaint();  // Redraw the panel if needed
-        }
+        repaint();
     }
 
     // Mouse clicked event to toggle the boolean value of a cell
