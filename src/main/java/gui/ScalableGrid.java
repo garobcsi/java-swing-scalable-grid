@@ -1,7 +1,13 @@
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListener, ActionListener, MouseListener {
     private static final int CELL_SIZE = 50;  // Default cell size
@@ -26,6 +32,27 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
 
         // Enable double buffering to reduce flickering and lag
         setDoubleBuffered(true);
+
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                resetPosition();
+            }
+        });
+    }
+
+    private void calculateInitialFit() {
+        // Calculate the optimal scale to fit the grid within the panel
+        double panelWidth = getWidth();
+        double panelHeight = getHeight();
+        double gridWidth = matrix[0].length * CELL_SIZE;
+        double gridHeight = matrix.length * CELL_SIZE;
+
+        // Calculate scale factors for both dimensions
+        double scaleX = panelWidth / gridWidth;
+        double scaleY = panelHeight / gridHeight;
+
+        targetScale = Math.min(scaleX, scaleY);
     }
 
     // Paint the grid
@@ -113,6 +140,7 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         targetOffsetX = 0;
         targetOffsetY = 0;
         targetScale = 1.0;
+        calculateInitialFit();  // Recalculate initial fit
     }
 
     // ActionPerformed is called every time the timer ticks (60 times per second)
@@ -167,10 +195,16 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
     public static void main(String[] args) {
         // Example matrix (all cells initially set to false, meaning white)
         boolean[][] matrix = {
-                {false, false, false, false},
-                {false, false, false, false},
-                {false, false, false, false},
-                {false, false, false, false}
+                {false,false,false,false,false,false,false,false,false,false,false,},
+                {false,false,false,false,false,false,false,false,false,false,false,},
+                {false,false,false,false,false,false,false,false,false,false,false,},
+                {false,false,false,false,false,false,false,false,false,false,false,},
+                {false,false,false,false,false,false,false,false,false,false,false,},
+                {false,false,false,false,false,false,false,false,false,false,false,},
+                {false,false,false,false,false,false,false,false,false,false,false,},
+                {false,false,false,false,false,false,false,false,false,false,false,},
+                {false,false,false,false,false,false,false,false,false,false,false,},
+                {false,false,false,false,false,false,false,false,false,false,false,},
         };
 
         JFrame frame = new JFrame("Scalable and Moveable Clickable Grid");
