@@ -23,6 +23,9 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         // Setup a timer for smooth movement (60 FPS)
         movementTimer = new Timer(16, this);
         movementTimer.start();
+
+        // Enable double buffering to reduce flickering and lag
+        setDoubleBuffered(true);
     }
 
     // Paint the grid
@@ -40,9 +43,15 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         transform.scale(scale, scale);  // Apply scaling
         g2d.setTransform(transform);
 
-        // Draw the grid
-        for (int row = 0; row < matrix.length; row++) {
-            for (int col = 0; col < matrix[row].length; col++) {
+        // Calculate visible grid boundaries (optimization to avoid rendering off-screen cells)
+        int startCol = Math.max(0, (int) (-offsetX / scale / CELL_SIZE));
+        int startRow = Math.max(0, (int) (-offsetY / scale / CELL_SIZE));
+        int endCol = Math.min(matrix[0].length, (int) ((getWidth() - offsetX) / scale / CELL_SIZE) + 1);
+        int endRow = Math.min(matrix.length, (int) ((getHeight() - offsetY) / scale / CELL_SIZE) + 1);
+
+        // Draw only the visible part of the grid
+        for (int row = startRow; row < endRow; row++) {
+            for (int col = startCol; col < endCol; col++) {
                 // Calculate cell position
                 int x = col * CELL_SIZE;
                 int y = row * CELL_SIZE;
@@ -114,7 +123,10 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         offsetY += (targetOffsetY - offsetY) * 0.1;
         scale += (targetScale - scale) * 0.1;
 
-        repaint();  // Redraw the panel
+        // Only repaint when the position or scale changes
+        if (Math.abs(offsetX - targetOffsetX) > 0.1 || Math.abs(offsetY - targetOffsetY) > 0.1 || Math.abs(scale - targetScale) > 0.01) {
+            repaint();  // Redraw the panel if needed
+        }
     }
 
     // Mouse clicked event to toggle the boolean value of a cell
