@@ -213,20 +213,33 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
 
         switch (e.getKeyCode()) {
             case KeyEvent.VK_LEFT:
-                targetOffsetX += moveAmount;
-                break;
-            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_A:{
                 targetOffsetX -= moveAmount;
                 break;
-            case KeyEvent.VK_UP:
-                targetOffsetY += moveAmount;
+            }
+            case KeyEvent.VK_RIGHT:
+            case KeyEvent.VK_D:{
+                targetOffsetX += moveAmount;
                 break;
-            case KeyEvent.VK_DOWN:
+            }
+            case KeyEvent.VK_UP:
+            case KeyEvent.VK_W:{
                 targetOffsetY -= moveAmount;
                 break;
-            case KeyEvent.VK_HOME:
-                resetPosition();  // Reset position and scale
+            }
+            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_S:{
+                targetOffsetY += moveAmount;
                 break;
+            }
+            case KeyEvent.VK_HOME: {
+                resetPosition();
+                break;
+            }
+            case KeyEvent.VK_R: {
+                Arrays.stream(matrix).forEach(x -> Arrays.fill(x, false));
+                break;
+            }
         }
     }
 
