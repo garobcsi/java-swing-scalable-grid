@@ -4,24 +4,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListener, ActionListener, MouseListener, MouseMotionListener {
+public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListener, ActionListener, MouseListener, MouseMotionListener, ComponentListener {
     private static final int CELL_SIZE = 50;  // Default cell size
     private boolean[][] matrix;  // The matrix to be displayed (boolean values)
     private double scale = 1.0;  // Scaling factor for zooming
@@ -41,6 +31,7 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         addKeyListener(this);
         addMouseListener(this);
         addMouseMotionListener(this);
+        addComponentListener(this);
         setFocusable(true);  // To capture key events
 
         // Setup a timer for smooth movement (60 FPS)
@@ -49,13 +40,6 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
 
         // Enable double buffering to reduce flickering and lag
         setDoubleBuffered(true);
-
-        addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                resetPosition();
-            }
-        });
     }
 
     // Toggle the boolean value of a cell on left click
@@ -248,6 +232,21 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
     public void keyReleased(KeyEvent e) {}
     @Override
     public void keyTyped(KeyEvent e) {}
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        resetPosition();
+    }
+
+    //Unused ComponentListener
+    @Override
+    public void componentMoved(ComponentEvent e) {}
+
+    @Override
+    public void componentShown(ComponentEvent e) {}
+
+    @Override
+    public void componentHidden(ComponentEvent e) {}
 
     public static void main(String[] args) {
         // Example matrix (all cells initially set to false, meaning white)
