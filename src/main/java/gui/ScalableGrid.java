@@ -9,7 +9,7 @@ import javax.swing.Timer;
 
 public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListener, ActionListener, MouseListener, MouseMotionListener, ComponentListener {
     private static final int CELL_SIZE = 50;  // Default cell size
-    private boolean[][] matrix;  // The matrix to be displayed (boolean values)
+    private final boolean[][] matrix;  // The matrix to be displayed (boolean values)
     private double scale = 1.0;  // Scaling factor for zooming
     private double targetScale = 1.0;  // Target scale for smooth zooming
     private double offsetX = 0, offsetY = 0;  // Offset for moving the grid
