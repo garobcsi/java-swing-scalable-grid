@@ -151,7 +151,7 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
     public void mouseWheelMoved(MouseWheelEvent e) {
         if (e.getPreciseWheelRotation() < 0) {
             targetScale += 0.1;  // Zoom in
-        } else if (targetScale > 0.1) {
+        } else {
             targetScale -= 0.1;  // Zoom out
         }
     }
