@@ -257,6 +257,15 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
                 Arrays.stream(matrix).forEach(x -> Arrays.fill(x, false));
                 break;
             }
+            case KeyEvent.VK_F: {
+                Random random = new Random();
+                Arrays.stream(matrix).forEach(row -> {
+                    for (int i = 0; i < row.length; i++) {
+                        row[i] = random.nextBoolean();  // fill with random boolean values
+                    }
+                });
+                break;
+            }
         }
     }
 
