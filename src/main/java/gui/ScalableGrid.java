@@ -1,3 +1,5 @@
+package gui;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -8,8 +10,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
@@ -18,7 +20,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListener, ActionListener, MouseListener {
+
+public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListener, ActionListener {
     private static final int CELL_SIZE = 50;  // Default cell size
     private boolean[][] matrix;  // The matrix to be displayed (boolean values)
     private double scale = 1.0;  // Scaling factor for zooming
@@ -28,11 +31,14 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
 
     private Timer movementTimer;  // Timer for smooth movement
 
+    // Variables to store initial positions for panning
+    private int lastMouseX, lastMouseY;
+    private boolean panning = false;
+
     public ScalableGrid(boolean[][] matrix) {
         this.matrix = matrix;
         addMouseWheelListener(this);
         addKeyListener(this);
-        addMouseListener(this);
         setFocusable(true);  // To capture key events
 
         // Setup a timer for smooth movement (60 FPS)
@@ -41,6 +47,50 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
 
         // Enable double buffering to reduce flickering and lag
         setDoubleBuffered(true);
+
+        // Add mouse listeners for panning and cell toggling
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    // Handle left click for toggling cells
+                    toggleCell(e.getX(), e.getY());
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+                    // Right button starts panning
+                    lastMouseX = e.getX();
+                    lastMouseY = e.getY();
+                    panning = true;
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    // Stop panning when right button is released
+                    panning = false;
+                }
+            }
+        });
+
+        // Add mouse motion listener for dragging/panning
+        addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (panning) {
+                    // Calculate the movement delta and update the target offset
+                    int deltaX = e.getX() - lastMouseX;
+                    int deltaY = e.getY() - lastMouseY;
+                    targetOffsetX += deltaX;
+                    targetOffsetY += deltaY;
+
+                    // Update last known mouse position
+                    lastMouseX = e.getX();
+                    lastMouseY = e.getY();
+
+                    repaint();
+                }
+            }
+        });
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -163,12 +213,11 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         repaint();
     }
 
-    // Mouse clicked event to toggle the boolean value of a cell
-    @Override
-    public void mouseClicked(MouseEvent e) {
+    // Toggle the boolean value of a cell on left click
+    private void toggleCell(int mouseX, int mouseY) {
         // Calculate the real position of the mouse in the grid, considering scaling and offset
-        int realX = (int) ((e.getX() - offsetX) / scale);
-        int realY = (int) ((e.getY() - offsetY) / scale);
+        int realX = (int) ((mouseX - offsetX) / scale);
+        int realY = (int) ((mouseY - offsetY) / scale);
 
         // Determine which cell was clicked
         int col = realX / CELL_SIZE;
@@ -181,16 +230,6 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
             repaint();  // Repaint to show the updated cell color
         }
     }
-
-    // Unused but required for MouseListener
-    @Override
-    public void mousePressed(MouseEvent e) {}
-    @Override
-    public void mouseReleased(MouseEvent e) {}
-    @Override
-    public void mouseEntered(MouseEvent e) {}
-    @Override
-    public void mouseExited(MouseEvent e) {}
 
     // Unused but required for KeyListener
     @Override
