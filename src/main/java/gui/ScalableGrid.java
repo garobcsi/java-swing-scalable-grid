@@ -4,7 +4,17 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 
 import javax.swing.JFrame;
@@ -18,8 +28,6 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
     private double targetScale = 1.0;  // Target scale for smooth zooming
     private int offsetX = 0, offsetY = 0;  // Offset for moving the grid
     private int targetOffsetX = 0, targetOffsetY = 0;  // Target offset for smooth movement
-
-    private Timer movementTimer;  // Timer for smooth movement
 
     // Variables to store initial positions for panning
     private int lastMouseX, lastMouseY;
@@ -35,7 +43,8 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         setFocusable(true);  // To capture key events
 
         // Setup a timer for smooth movement (60 FPS)
-        movementTimer = new Timer(16, this);
+        // Timer for smooth movement
+        Timer movementTimer = new Timer(16, this);
         movementTimer.start();
 
         // Enable double buffering to reduce flickering and lag
@@ -56,7 +65,6 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         if (row >= 0 && row < matrix.length && col >= 0 && col < matrix[0].length) {
             // Toggle the boolean value of the clicked cell
             matrix[row][col] = !matrix[row][col];
-            repaint();  // Repaint to show the updated cell color
         }
     }
 
@@ -129,8 +137,8 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
     @Override
     public void actionPerformed(ActionEvent e) {
         // Smoothly interpolate towards the target offset and scale
-        offsetX += (targetOffsetX - offsetX) * 0.1;
-        offsetY += (targetOffsetY - offsetY) * 0.1;
+        offsetX += (int) ((targetOffsetX - offsetX) * 0.1);
+        offsetY += (int) ((targetOffsetY - offsetY) * 0.1);
         scale += (targetScale - scale) * 0.1;
 
         repaint();
@@ -144,7 +152,6 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         } else if (targetScale > 0.1) {
             targetScale -= 0.1;  // Zoom out
         }
-        repaint();
     }
 
     // Mouse pressed event
@@ -183,8 +190,6 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
             // Update last known mouse position
             lastMouseX = e.getX();
             lastMouseY = e.getY();
-
-            repaint();
         }
     }
 
@@ -223,8 +228,6 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
                 resetPosition();  // Reset position and scale
                 break;
         }
-
-        repaint();
     }
 
     // Unused but required for KeyListener
@@ -250,18 +253,7 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
 
     public static void main(String[] args) {
         // Example matrix (all cells initially set to false, meaning white)
-        boolean[][] matrix = {
-                {false,false,false,false,false,false,false,false,false,false,false,},
-                {false,false,false,false,false,false,false,false,false,false,false,},
-                {false,false,false,false,false,false,false,false,false,false,false,},
-                {false,false,false,false,false,false,false,false,false,false,false,},
-                {false,false,false,false,false,false,false,false,false,false,false,},
-                {false,false,false,false,false,false,false,false,false,false,false,},
-                {false,false,false,false,false,false,false,false,false,false,false,},
-                {false,false,false,false,false,false,false,false,false,false,false,},
-                {false,false,false,false,false,false,false,false,false,false,false,},
-                {false,false,false,false,false,false,false,false,false,false,false,},
-        };
+        boolean[][] matrix = new boolean[20][20];
 
         JFrame frame = new JFrame("Scalable and Moveable Clickable Grid");
         ScalableGrid grid = new ScalableGrid(matrix);
