@@ -38,9 +38,7 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         setDoubleBuffered(true);
     }
 
-    // Toggle the boolean value of a cell on left click
-    private void toggleCell(int mouseX, int mouseY) {
-        // Calculate the real position of the mouse in the grid, considering scaling and offset
+    private int[] getCellCoordinates(int mouseX, int mouseY) {
         int realX = (int) ((mouseX - offsetX) / scale);
         int realY = (int) ((mouseY - offsetY) / scale);
 
@@ -48,25 +46,30 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         int col = realX / CELL_SIZE;
         int row = realY / CELL_SIZE;
 
-        // Ensure the click is within the bounds of the matrix
+        // Return an array with row and col, or null if out of bounds
         if (row >= 0 && row < matrix.length && col >= 0 && col < matrix[0].length) {
-            // Toggle the boolean value of the clicked cell
+            return new int[]{row, col};
+        }
+        return null; // return null if the cell is out of bounds
+    }
+
+    // Toggle the cell's value
+    private void toggleCell(int mouseX, int mouseY) {
+        int[] coordinates = getCellCoordinates(mouseX, mouseY);
+        if (coordinates != null) {
+            int row = coordinates[0];
+            int col = coordinates[1];
             matrix[row][col] = !matrix[row][col];
         }
     }
 
-    private void setCell(int mouseX, int mouseY,boolean cell) {
-        // Calculate the real position of the mouse in the grid, considering scaling and offset
-        int realX = (int) ((mouseX - offsetX) / scale);
-        int realY = (int) ((mouseY - offsetY) / scale);
-
-        // Determine which cell was clicked
-        int col = realX / CELL_SIZE;
-        int row = realY / CELL_SIZE;
-
-        // Ensure the click is within the bounds of the matrix
-        if (row >= 0 && row < matrix.length && col >= 0 && col < matrix[0].length) {
-            matrix[row][col] = cell;
+    // Set the cell's value to a specific boolean
+    private void setCell(int mouseX, int mouseY, boolean cellValue) {
+        int[] coordinates = getCellCoordinates(mouseX, mouseY);
+        if (coordinates != null) {
+            int row = coordinates[0];
+            int col = coordinates[1];
+            matrix[row][col] = cellValue;
         }
     }
 
