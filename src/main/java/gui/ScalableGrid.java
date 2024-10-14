@@ -26,8 +26,8 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
     private boolean[][] matrix;  // The matrix to be displayed (boolean values)
     private double scale = 1.0;  // Scaling factor for zooming
     private double targetScale = 1.0;  // Target scale for smooth zooming
-    private int offsetX = 0, offsetY = 0;  // Offset for moving the grid
-    private int targetOffsetX = 0, targetOffsetY = 0;  // Target offset for smooth movement
+    private double offsetX = 0, offsetY = 0;  // Offset for moving the grid
+    private double targetOffsetX = 0, targetOffsetY = 0;  // Target offset for smooth movement
 
     // Variables to store initial positions for panning
     private int lastMouseX, lastMouseY;
@@ -137,8 +137,8 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
     @Override
     public void actionPerformed(ActionEvent e) {
         // Smoothly interpolate towards the target offset and scale
-        offsetX += (int) ((targetOffsetX - offsetX) * 0.1);
-        offsetY += (int) ((targetOffsetY - offsetY) * 0.1);
+        offsetX +=  ((targetOffsetX - offsetX) * 0.1);
+        offsetY +=  ((targetOffsetY - offsetY) * 0.1);
         scale += (targetScale - scale) * 0.1;
 
         repaint();
