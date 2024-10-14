@@ -1,24 +1,10 @@
 package gui;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.awt.geom.AffineTransform;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.*;
+import java.util.*;
+import javax.swing.*;
 import javax.swing.Timer;
 
 public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListener, ActionListener, MouseListener, MouseMotionListener, ComponentListener {
@@ -32,6 +18,7 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
     // Variables to store initial positions for panning
     private int lastMouseX, lastMouseY;
     private boolean panning = false;
+    private boolean drawPanning = false;
 
     public ScalableGrid(boolean[][] matrix) {
         this.matrix = matrix;
@@ -65,6 +52,21 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
         if (row >= 0 && row < matrix.length && col >= 0 && col < matrix[0].length) {
             // Toggle the boolean value of the clicked cell
             matrix[row][col] = !matrix[row][col];
+        }
+    }
+
+    private void setCell(int mouseX, int mouseY,boolean cell) {
+        // Calculate the real position of the mouse in the grid, considering scaling and offset
+        int realX = (int) ((mouseX - offsetX) / scale);
+        int realY = (int) ((mouseY - offsetY) / scale);
+
+        // Determine which cell was clicked
+        int col = realX / CELL_SIZE;
+        int row = realY / CELL_SIZE;
+
+        // Ensure the click is within the bounds of the matrix
+        if (row >= 0 && row < matrix.length && col >= 0 && col < matrix[0].length) {
+            matrix[row][col] = cell;
         }
     }
 
@@ -157,23 +159,36 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
     // Mouse pressed event
     @Override
     public void mousePressed(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            // Handle left click for toggling cells
-            toggleCell(e.getX(), e.getY());
-        } else if (e.getButton() == MouseEvent.BUTTON3) {
-            // Right button starts panning
-            lastMouseX = e.getX();
-            lastMouseY = e.getY();
-            panning = true;
+        switch (e.getButton()) {
+            case MouseEvent.BUTTON1: {
+                toggleCell(e.getX(), e.getY());
+                break;
+            }
+            case MouseEvent.BUTTON2: {
+                drawPanning = true;
+                break;
+            }
+            case MouseEvent.BUTTON3: {
+                lastMouseX = e.getX();
+                lastMouseY = e.getY();
+                panning = true;
+                break;
+            }
         }
     }
 
     // Mouse released event
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON3) {
-            // Stop panning when right button is released
-            panning = false;
+        switch (e.getButton()) {
+            case MouseEvent.BUTTON2: {
+                drawPanning = false;
+                break;
+            }
+            case MouseEvent.BUTTON3: {
+                panning = false;
+                break;
+            }
         }
     }
 
@@ -190,6 +205,8 @@ public class ScalableGrid extends JPanel implements MouseWheelListener, KeyListe
             // Update last known mouse position
             lastMouseX = e.getX();
             lastMouseY = e.getY();
+        } else if (drawPanning) {
+            setCell(e.getX(), e.getY(),true);
         }
     }
 
